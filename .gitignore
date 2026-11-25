@@ -1,0 +1,30 @@
+# Secrets / local environment
+.env
+*.local.yaml
+
+# Real device inventories — contain live IPs/hostnames. Commit only the
+# *.example.yaml samples.
+config/inventory.orion.yaml
+config/devices.yaml
+
+# Compiled binaries
+/orion-collect
+/netgrab-backfill
+/netgrab-local
+/netgrab-export
+cmd/gitlab-storage/gitlab-storage
+*.exe
+*.test
+*.out
+
+# Runtime artifacts (collected configs, parsed models, exports)
+/tmp/
+tmp/local-storage/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store

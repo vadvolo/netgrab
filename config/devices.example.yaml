@@ -1,0 +1,31 @@
+# Example device inventory for the direct-SSH collectors
+# (cmd/local-storage, cmd/gitlab-storage).
+#
+# Same format as the Orion inventory (see internal/inventory): a list of devices
+# plus named credential groups. Credential values are ${ENV} references expanded
+# at load time, so no secret is stored in this file.
+#
+# Copy to config/devices.yaml (gitignored) and point -inventory / DEVICES_INVENTORY
+# at it for real runs.
+devices:
+  - hostname: "csr1000v"
+    ip: 192.0.2.1
+    vendor: cisco
+    platform: ios
+
+  - hostname: "access-sw-1"
+    ip: 192.0.2.2
+    vendor: cisco
+    platform: ios
+
+  - hostname: "core-sw-1"
+    ip: 192.0.2.3
+    vendor: cisco
+    platform: ios
+
+# Named credential groups. A device's `role` selects a group, falling back to
+# `default`. Secrets come from the environment (see .env.example).
+credentials:
+  default:
+    login: "${DEVICE_USERNAME}"
+    password: "${DEVICE_PASSWORD}"

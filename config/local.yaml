@@ -1,0 +1,9 @@
+enabled: true
+storagePath: "./tmp/local-storage"
+
+httpServer:
+  address: "localhost:8080"
+  timeout: 3s
+  idle_timeout: 60s
+  user: admin                     # env HTTP_SERVER_USER
+  password: ""                    # env HTTP_SERVER_PASSWORD (set via env / .env)

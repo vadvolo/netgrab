@@ -1,0 +1,56 @@
+# Example Orion inventory (a handful of representative models across vendors).
+# Real runs point inventoryPath at the full annet-oil inventory, e.g.:
+#   /path/to/annet-oil/resources/inventory.orion.yaml
+#
+# Credential values are ${ENV} references, expanded at load time — set the env
+# vars before running so no secret is stored here.
+devices:
+  - hostname: "site-a-eltex-1"
+    ip: 192.0.2.11
+    port: 21022
+    vendor: eltex
+    platform: mes
+    description: "MES3324F"
+
+  - hostname: "site-a-cat4948-1"
+    ip: 192.0.2.12
+    port: 22
+    vendor: cisco
+    platform: ios
+    description: "Catalyst 4948"
+
+  - hostname: "client-router-1"
+    ip: 192.0.2.13
+    port: 22
+    vendor: ros
+    role: client-router
+    platform: routeros
+    description: "RB3011UiAS"
+
+  - hostname: "infra-router-1"
+    ip: 192.0.2.14
+    port: 10022
+    vendor: ros
+    role: infra-router
+    platform: routeros
+    description: "RB3011UiAS"
+
+  - hostname: "site-a-olt-1"
+    ip: 192.0.2.15
+    port: 22
+    vendor: huawei
+    platform: smartax
+    description: "MA5608T"
+
+# Named credential groups. A device's `role` selects a group, tried first at
+# login and falling back to `default`.
+credentials:
+  default:
+    login: "${DEVICE_USERNAME}"
+    password: "${DEVICE_PASSWORD}"
+  infra-router:
+    login: "${INFRA_ROUTER_USERNAME}"
+    password: "${INFRA_ROUTER_PASSWORD}"
+  client-router:
+    login: "${CLIENT_ROUTER_USERNAME}"
+    password: "${CLIENT_ROUTER_PASSWORD}"

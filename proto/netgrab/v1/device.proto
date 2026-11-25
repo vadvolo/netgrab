@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+// Package netgrab.v1 is netgrab's canonical device-configuration model: the
+// normalized, vendor-neutral shape that every platform parser produces and
+// every exporter (csv/json/yaml/toml/tf) consumes.
+//
+// The raw CLI dump collected from a device is messy and vendor-specific; this
+// model is the common denominator we actually care about for inventory and
+// NetBox: identity, interfaces, addressing, VLANs and static routes.
+package netgrab.v1;
+
+option go_package = "netgrab/internal/model/netgrabv1;netgrabv1";
+
+// DeviceConfig is one device's configuration after parsing.
+message DeviceConfig {
+  // Identity.
+  string hostname = 1;
+  string vendor = 2;    // inventory vendor (ros, cisco, eltex, huawei, ...)
+  string platform = 3;  // inventory platform (routeros, ios, mes, smartax, ...)
+  string model = 4;     // hardware model if discoverable (e.g. "RB3011UiAS")
+  string os_version = 5;
+  string serial = 6;
+  string management_ip = 7;  // primary/mgmt address (from inventory or config)
+
+  // Provenance.
+  string source_command = 8;          // CLI command that produced the raw config
+  string raw_config_sha256 = 9;       // sha256 of the raw config bytes
+  int64 raw_config_bytes = 10;        // size of the raw config
+  int64 collected_at_unix = 11;       // collection time (unix seconds)
+  string parser = 12;                 // parser id that produced this model
+
+  // Normalized facts.
+  repeated Interface interfaces = 13;
+  repeated Vlan vlans = 14;
+  repeated StaticRoute routes = 15;
+
+  // Diagnostics: non-fatal things the parser could not fully understand.
+  repeated string warnings = 16;
+}
+
+// InterfaceMode is the L2 switching mode of a port.
+enum InterfaceMode {
+  INTERFACE_MODE_UNSPECIFIED = 0;
+  INTERFACE_MODE_ACCESS = 1;
+  INTERFACE_MODE_TRUNK = 2;
+  INTERFACE_MODE_ROUTED = 3;  // L3 / no switchport
+}
+
+// Interface is one logical or physical interface.
+message Interface {
+  string name = 1;
+  string description = 2;
+  bool enabled = 3;         // false if administratively shut down
+  uint32 mtu = 4;
+  string mac_address = 5;
+  string type = 6;          // ethernet, vlan, loopback, bridge, lag, wlan, ...
+  repeated string ip_addresses = 7;  // CIDR strings, e.g. "10.0.0.1/24"
+  InterfaceMode mode = 8;
+  uint32 access_vlan = 9;            // untagged VLAN id when mode=ACCESS
+  repeated uint32 tagged_vlans = 10; // tagged VLAN ids when mode=TRUNK
+  string parent = 11;                // parent interface (for sub/virtual ifaces)
+  double speed_mbps = 12;
+}
+
+// Vlan is a VLAN definition.
+message Vlan {
+  uint32 id = 1;
+  string name = 2;
+}
+
+// StaticRoute is one static route entry.
+message StaticRoute {
+  string prefix = 1;    // destination CIDR, e.g. "0.0.0.0/0"
+  string next_hop = 2;  // gateway IP or outgoing interface
+  uint32 distance = 3;  // administrative distance / metric
+}
+
+// DeviceConfigSet is a batch of parsed devices (what exporters operate on).
+message DeviceConfigSet {
+  repeated DeviceConfig devices = 1;
+}

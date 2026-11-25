@@ -1,0 +1,50 @@
+# netgrab — local Orion config collection.
+#
+# Secrets (server + device passwords) come from the environment / .env, never
+# this file. Every value below can be overridden by the env var in the comment.
+
+# Path to the Orion inventory (same format annet-oil uses). Point this at your
+# own full fleet inventory; use the example file for a quick smoke test.
+inventoryPath: "./config/inventory.orion.yaml"            # env INVENTORY_PATH
+# inventoryPath: "./config/inventory.orion.example.yaml"  # small demo subset
+
+storagePath: "./tmp/local-storage"                        # env STORAGE_PATH
+concurrency: 20                                           # env COLLECT_CONCURRENCY
+
+# The remote gnetcli gRPC server that opens the SSH sessions. This is a
+# gnetcli_server (binds 0.0.0.0:50051, basic auth) reachable from where netgrab
+# runs. Set the host/credentials via env / .env.
+gnetcli:
+  host: ""                   # env GNETCLI_HOST  (e.g. gnetcli.example.net)
+  port: 50051                # env GNETCLI_PORT
+  # Server basic-auth. Set via env: GNETCLI_LOGIN / GNETCLI_PASSWORD, or supply
+  # a pre-encoded base64("login:password") token as GNETCLI_AUTH_TOKEN.
+  login: ""                  # env GNETCLI_LOGIN
+  password: ""               # env GNETCLI_PASSWORD
+  auth_token: ""             # env GNETCLI_AUTH_TOKEN
+  tls: false                 # env GNETCLI_TLS
+  read_timeout_sec: 0        # env GNETCLI_READ_TIMEOUT_SEC (0 = server default)
+  cmd_timeout_sec: 0         # env GNETCLI_CMD_TIMEOUT_SEC  (0 = server default)
+
+# annet-oil HTTP execute API — the alternative collection path (-via annet-oil).
+# annet-oil already owns the Orion inventory and every device's credentials, so
+# netgrab POSTs just a host + command and lets annet-oil resolve creds and run
+# the session. No device secrets needed on the netgrab side.
+annetoil:
+  base_url: ""               # env ANNETOIL_BASE_URL (e.g. http://annet-oil.example.net:8181/api/v0)
+  token: ""                  # env ANNETOIL_TOKEN (Bearer token)
+  timeout_sec: 0             # env ANNETOIL_TIMEOUT_SEC (0 = client default)
+
+# S3-compatible object storage. When enabled, raw configs, parsed models and
+# exports are written to S3 in addition to local storage. Any S3 API works
+# (AWS S3, MinIO, a cloud object store). Credentials come from the environment
+# (AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY), never this file.
+s3:
+  enabled: false                               # env S3_ENABLED
+  bucket: "netgrab"                            # env S3_BUCKET
+  endpoint: ""                                 # env S3_ENDPOINT (empty = AWS default; set for MinIO/other)
+  region: "us-east-1"                          # env S3_REGION
+  profile: ""                                  # env S3_PROFILE
+  access_key: ""                               # env AWS_ACCESS_KEY_ID
+  secret_key: ""                               # env AWS_SECRET_ACCESS_KEY
+  use_path_style: false                        # env S3_USE_PATH_STYLE (MinIO requires path-style)

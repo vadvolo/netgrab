@@ -1,0 +1,5 @@
+enabled: true
+url: env:GITLAB_URL         # e.g. "https://gitlab.example.com"
+project: env:GITLAB_PROJECT # URL-encoded "namespace/project", e.g. "your-group%2Fnetconfigs"
+branch: "main"
+token: env:GITLAB_TOKEN     # personal access token, e.g. "glpat-xxxxxxxxxxxx"
